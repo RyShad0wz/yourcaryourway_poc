@@ -34,19 +34,18 @@ CREATE TABLE user_profiles (
     INDEX idx_profile_user (user_id)
 ) ENGINE=InnoDB;
 
--- Table des agences
+-- Table des agences (version corrigée sans SRID)
 CREATE TABLE agencies (
     id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
     name VARCHAR(200) NOT NULL,
     country_code VARCHAR(2) NOT NULL,
     address JSON NOT NULL,
-    gps_coordinates POINT SRID 4326,
+    gps_coordinates POINT, -- SRID retiré pour compatibilité
     opening_hours JSON,
     contact_email VARCHAR(255),
     contact_phone VARCHAR(20),
     created_at DATETIME(6) DEFAULT CURRENT_TIMESTAMP(6),
-    INDEX idx_agency_country (country_code),
-    SPATIAL INDEX idx_agency_coordinates (gps_coordinates)
+    INDEX idx_agency_country (country_code)
 ) ENGINE=InnoDB;
 
 -- Table des catégories de véhicules (norme ACRISS)
@@ -158,7 +157,7 @@ INSERT INTO vehicle_categories (code, description, vehicle_type, transmission_ty
 ('SDAR', 'Standard 2/4 Door', 'Standard', 'automatic', 'petrol', TRUE, 3, 5),
 ('FDAR', 'Fullsize 2/4 Door', 'Fullsize', 'automatic', 'petrol', TRUE, 4, 5);
 
--- Agences exemple
+-- Agences exemple (sans coordonnées GPS pour simplifier)
 INSERT INTO agencies (id, name, country_code, address, contact_email, contact_phone) VALUES
 (UUID(), 'Paris Centre', 'FR', '{"street": "12 Rue de Rivoli", "city": "Paris", "postalCode": "75001", "country": "France"}', 'paris@yourcaryourway.com', '+33123456789'),
 (UUID(), 'Lyon Part-Dieu', 'FR', '{"street": "5 Rue de la République", "city": "Lyon", "postalCode": "69003", "country": "France"}', 'lyon@yourcaryourway.com', '+33456789012'),
@@ -166,9 +165,9 @@ INSERT INTO agencies (id, name, country_code, address, contact_email, contact_ph
 
 -- Véhicules exemple
 INSERT INTO vehicles (id, agency_id, category_code, make, model, year, features, daily_rate) VALUES
-(UUID(), (SELECT id FROM agencies WHERE name = 'Paris Centre' LIMIT 1), 'ECAR', 'Renault', 'Clio', 2023, '{"airbag": 6, "gps": true, "bluetooth": true}', 45.00),
-(UUID(), (SELECT id FROM agencies WHERE name = 'Paris Centre' LIMIT 1), 'CDAR', 'Peugeot', '208', 2023, '{"airbag": 6, "gps": true, "bluetooth": true, "cruiseControl": true}', 55.00),
-(UUID(), (SELECT id FROM agencies WHERE name = 'Lyon Part-Dieu' LIMIT 1), 'IDAR', 'Volkswagen', 'Golf', 2023, '{"airbag": 8, "gps": true, "bluetooth": true, "cruiseControl": true, "parkingSensors": true}', 65.00);
+(UUID(), (SELECT id FROM agencies WHERE name = 'Paris Centre' LIMIT 1), 'ECAR', 'Renault', 'Clio', 2023, '{"airbags": 6, "gps": true, "bluetooth": true}', 45.00),
+(UUID(), (SELECT id FROM agencies WHERE name = 'Paris Centre' LIMIT 1), 'CDAR', 'Peugeot', '208', 2023, '{"airbags": 6, "gps": true, "bluetooth": true, "cruiseControl": true}', 55.00),
+(UUID(), (SELECT id FROM agencies WHERE name = 'Lyon Part-Dieu' LIMIT 1), 'IDAR', 'Volkswagen', 'Golf', 2023, '{"airbags": 8, "gps": true, "bluetooth": true, "cruiseControl": true, "parkingSensors": true}', 65.00);
 
 -- Utilisateur de test
 INSERT INTO users (id, email, password_hash, status, preferred_language, preferred_currency) VALUES
@@ -183,3 +182,4 @@ SELECT 'Database yourcaryourway_db created successfully!' as Status;
 SELECT COUNT(*) as 'Number of vehicle categories' FROM vehicle_categories;
 SELECT COUNT(*) as 'Number of agencies' FROM agencies;
 SELECT COUNT(*) as 'Number of vehicles' FROM vehicles;
+SELECT COUNT(*) as 'Number of users' FROM users;
