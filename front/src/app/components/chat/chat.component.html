@@ -1,0 +1,41 @@
+<div class="chat-container">
+  <h2>PoC - Chat Service Client</h2>
+  
+  <div class="connection-status" [class.connected]="isConnected" [class.disconnected]="!isConnected">
+    {{ isConnected ? ' Connecté au service' : ' Déconnecté' }}
+  </div>
+
+  <div class="chat-box">
+    <div *ngFor="let msg of messages" 
+         class="message" 
+         [class.my-message]="msg.sender === sender"
+         [class.other-message]="msg.sender !== sender">
+      
+      <strong>{{ msg.sender }}:</strong> 
+      {{ msg.content }}
+      <small>{{ msg.timestamp | date:'HH:mm:ss' }}</small>
+    </div>
+  </div>
+
+  <div class="input-container">
+    <input 
+      type="text" 
+      [(ngModel)]="sender" 
+      placeholder="Votre nom" 
+      class="sender-input"
+    >
+    
+    <input 
+      type="text" 
+      [(ngModel)]="newMessage" 
+      placeholder="Tapez votre message..." 
+      (keyup.enter)="sendMessage()"
+      class="message-input"
+    >
+    
+    <button (click)="sendMessage()" [disabled]="!isConnected">
+    Envoyer
+    </button>
+    
+  </div>
+</div>
